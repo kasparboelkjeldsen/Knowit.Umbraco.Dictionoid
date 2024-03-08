@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+	<TargetFrameworks>net7.0;net8.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ContentTargetFolders>.</ContentTargetFolders>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>Knowit.Umbraco.Dictionoid</PackageId>
+    <Product>Knowit.Umbraco.Dictionoid</Product>
+    <Title>Knowit.Umbraco.Dictionoid</Title>
+    <Description>...</Description>
+    <PackageTags>umbraco plugin package</PackageTags>
+    <Version>0.1.3</Version>
+    <PackageReadmeFile>README</PackageReadmeFile>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="OpenAI" Version="1.10.0" />
+    <PackageReference Include="Umbraco.Cms.Web.Website" Version="[12.0.0,14.0.0)" />
+    <PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="[12.0.0,14.0.0)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="App_Plugins\Knowit.Umbraco.Dictionoid\**" ExcludeFromSingleFile="true" CopyToPublishDirectory="Always" />
+    <None Include="buildTransitive\**" Pack="true" PackagePath="buildTransitive" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+	<ItemGroup>
+		<None Update="App_Plugins\Knowit.Umbraco.Dictionoid\dictionoid.js">
+			<PackagePath>contentFiles\any\any;content</PackagePath>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<CopyToPublishDirectory>Always</CopyToPublishDirectory>
+			<PackageCopyToOutput>true</PackageCopyToOutput>
+			<Pack>true</Pack>
+		</None>
+		<None Update="App_Plugins\Knowit.Umbraco.Dictionoid\package.manifest">
+			<PackagePath>contentFiles\any\any;content</PackagePath>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<CopyToPublishDirectory>Always</CopyToPublishDirectory>
+			<PackageCopyToOutput>true</PackageCopyToOutput>
+			<Pack>true</Pack>
+		</None>
+	</ItemGroup>
+
+</Project>

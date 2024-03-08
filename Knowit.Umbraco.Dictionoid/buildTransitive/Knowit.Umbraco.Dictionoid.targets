@@ -1,0 +1,21 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <KnowitUmbracoDictionoidContentFilesPath>$(MSBuildThisFileDirectory)..\App_Plugins\Knowit.Umbraco.Dictionoid\**\*.*</KnowitUmbracoDictionoidContentFilesPath>
+  </PropertyGroup>
+
+  <Target Name="CopyKnowitUmbracoDictionoidAssets" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <KnowitUmbracoDictionoidContentFiles Include="$(KnowitUmbracoDictionoidContentFilesPath)" />
+    </ItemGroup>
+    <Message Text="Copying Knowit.Umbraco.Dictionoid files: $(KnowitUmbracoDictionoidContentFilesPath) - #@(KnowitUmbracoDictionoidContentFiles->Count()) files" Importance="high" />
+    <Copy SourceFiles="@(KnowitUmbracoDictionoidContentFiles)" DestinationFiles="@(KnowitUmbracoDictionoidContentFiles->'$(MSBuildProjectDirectory)\App_Plugins\Knowit.Umbraco.Dictionoid\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="ClearKnowitUmbracoDictionoidAssets" BeforeTargets="Clean">
+    <ItemGroup>
+      <KnowitUmbracoDictionoidDir Include="$(MSBuildProjectDirectory)\App_Plugins\Knowit.Umbraco.Dictionoid\" />
+    </ItemGroup>
+    <Message Text="Clear old Knowit.Umbraco.Dictionoid data" Importance="high" />
+    <RemoveDir Directories="@(KnowitUmbracoDictionoidDir)" />
+  </Target>
+</Project>
