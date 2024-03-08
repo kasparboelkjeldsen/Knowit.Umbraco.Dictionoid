@@ -7,6 +7,7 @@ Particularly useful for projects requiring localization in multiple languages, i
 ## Features
 
 - **Automatic Translations**: With a simple button click, Dictionoid translates your text into all languages set up in Umbraco, streamlining content localization.
+- **Hover To See Translations**: The package extends the default view of Umbraco's Translate section, to show tranlation-values on hover.
 - **Translation History**: Track changes to your dictionary items, maintaining a record of modifications over time for better version control.
 - **Code-First Dictionary Generation**: For developers, Dictionoid offers the ability to generate dictionary items directly from code using `@await Umbraco.Dictionoid("My dictionary item", "my.key")`, eliminating the need to manually create items in the back office.
 - **Source Code Integration**: Seamlessly integrates with your Umbraco projects, offering features like dictionary item tracking and source code cleanup post-item creation.
@@ -35,6 +36,10 @@ For developers seeking to leverage advanced features, the full configuration is 
 ```
 
 **Note:** Features like `CreateOnNotExist`, `CleanupAfterCreate`, and `CleanupInBackoffice` are powerful tools that modify source code and should be used with caution, ideally outside of production environments, to avoid unintended alterations.
+
+### Hover to See Translation
+
+The "Hover to See Translation" feature enhances the user experience within the Umbraco back office, specifically in the translation section. It is designed to streamline the process of reviewing translations by providing immediate visibility. When a user hovers over an item in the main translation table, this feature displays a tooltip showing the translation content for that particular item. This allows for quick verification and comparison of translations across different languages without the need to click into each dictionary item individually. It is particularly use
 
 ### Code-First Dictionary Items
 
