@@ -296,3 +296,5 @@ __pycache__/
 /Umbraco12/wwwroot/App_Plugins/CustomBlockController/customBlock.js
 /Umbraco12/wwwroot/App_Plugins/CustomBlockController/defaultView.html
 /Umbraco12/wwwroot/App_Plugins/CustomBlockController/package.manifest
+
+Umbraco13/appsettings.json
