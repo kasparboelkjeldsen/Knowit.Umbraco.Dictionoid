@@ -58,6 +58,18 @@ The `TrackHistory` functionality addresses a common limitation in Umbraco regard
 
 The `CleanupAfterCreate` feature is designed for developers to ensure their source code remains clean and straightforward following the use of Dictionoid's code-first generation capabilities. Once a dictionary item is successfully created and translations are populated, this feature automates the process of replacing `@await Umbraco.Dictionoid` calls with the conventional `@Umbraco.GetDictionaryValue` in your source code. This transformation occurs in your `.cshtml` files, ensuring that future references to these dictionary items adhere to standard Umbraco practices. Enabling `CleanupAfterCreate` is especially beneficial during the development phase, helping maintain a clean codebase and ensuring that your dictionary item references are always up-to-date. However, it is recommended to use this feature cautiously and review changes it makes, particularly when used in production environments, to avoid unintended consequences.
 
+### Obtaining an OpenAI API Key
+
+To leverage the translation and language processing features of Dictionoid, you'll need to obtain an API key from OpenAI. Here's a straightforward guide to help you secure your API key:
+
+1. **Create an OpenAI Account**: Visit [OpenAI's website](https://www.openai.com/) and sign up for an account if you don't already have one.
+2. **Access the API Section**: Once logged in, navigate to the API section, typically found in your account dashboard or under a designated API menu.
+3. **Register Your Application**: You might need to register your application and describe its purpose. This step helps OpenAI understand how their API will be used.
+4. **Generate API Key**: Follow the prompts to generate a new API key. This key will serve as your unique identifier and token for accessing the OpenAI services.
+5. **Secure Your API Key**: Store your API key securely and avoid sharing it publicly. Treat it like a password, as it provides access to your OpenAI account and billing information.
+
+Once you have your API key, you can input it into your `appsettings.json` under `Knowit.Umbraco.Dictionoid` to enable the integration within your Umbraco project.
+
 
 ## License
 
