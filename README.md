@@ -1,6 +1,8 @@
 # Knowit.Umbraco.Dictionoid
 
-Dictionoid integrates OpenAI's language capabilities with Umbraco, streamlining the translation process within the platform. By leveraging OpenAI's Completion API and requiring an API key for access, Dictionoid simplifies the management of multilingual content for developers and content managers. Particularly useful for projects requiring localization in multiple languages, it significantly reduces the manual effort of creating translations, benefiting projects that commonly pair local languages with English.
+Dictionoid integrates OpenAI's language capabilities with Umbraco, streamlining the translation process within the platform. 
+By leveraging OpenAI's Completion API and requiring an API key for access, Dictionoid simplifies the management of multilingual content for developers and content managers. 
+Particularly useful for projects requiring localization in multiple languages, it significantly reduces the manual effort of creating translations.
 
 ## Features
 
@@ -37,6 +39,20 @@ For developers seeking to leverage advanced features, the full configuration is 
 ### Code-First Dictionary Items
 
 The `CreateOnNotExist` feature facilitates a code-first approach, allowing developers to define dictionary items within their codebase. If a specified key does not exist, Dictionoid auto-generates it and populates translations using OpenAI, streamlining the development workflow.
+
+### CleanupInBackoffice
+
+The `CleanupInBackoffice` feature provides a user-friendly interface within Umbraco's back office to facilitate the cleanup process of your dictionary items. By introducing a dedicated button in the translation section, this feature allows users to effortlessly iterate through every `.cshtml` file under the `/Views` directory. When activated, `CleanupInBackoffice` searches for instances where `Umbraco.Dictionoid` has been used and, if the associated dictionary item exists, replaces this code with the standard `Umbraco.GetDictionaryValue` method. This ensures that your code remains clean and maintainable, particularly useful for tidying up after bulk dictionary item generation or when preparing your project for production deployment.
+
+### TrackHistory
+
+The `TrackHistory` functionality addresses a common limitation in Umbraco regarding dictionary item modifications: once a dictionary item is altered, its previous state is typically lost. With `TrackHistory` enabled, Dictionoid creates a new database table, `KnowitDictionoidHistory`, to log every change made to dictionary items. This includes capturing both the old and new values whenever an update occurs. Accessible through the dictionary item editing interface, this history allows developers and content managers to review and revert changes if necessary, providing an invaluable audit trail and enhancing content integrity over time.
+
+
+### CleanupAfterCreate
+
+The `CleanupAfterCreate` feature is designed for developers to ensure their source code remains clean and straightforward following the use of Dictionoid's code-first generation capabilities. Once a dictionary item is successfully created and translations are populated, this feature automates the process of replacing `@await Umbraco.Dictionoid` calls with the conventional `@Umbraco.GetDictionaryValue` in your source code. This transformation occurs in your `.cshtml` files, ensuring that future references to these dictionary items adhere to standard Umbraco practices. Enabling `CleanupAfterCreate` is especially beneficial during the development phase, helping maintain a clean codebase and ensuring that your dictionary item references are always up-to-date. However, it is recommended to use this feature cautiously and review changes it makes, particularly when used in production environments, to avoid unintended consequences.
+
 
 ## License
 
