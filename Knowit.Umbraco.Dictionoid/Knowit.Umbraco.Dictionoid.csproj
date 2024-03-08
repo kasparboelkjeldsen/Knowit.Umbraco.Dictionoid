@@ -10,10 +10,16 @@
     <PackageId>Knowit.Umbraco.Dictionoid</PackageId>
     <Product>Knowit.Umbraco.Dictionoid</Product>
     <Title>Knowit.Umbraco.Dictionoid</Title>
-    <Description>...</Description>
+    <Description>Dictionoid is a versatile Umbraco plugin that integrates OpenAI's advanced language capabilities, offering automatic translation, code-first dictionary generation, and history tracking to streamline and enhance multilingual content management.</Description>
     <PackageTags>umbraco plugin package</PackageTags>
     <Version>0.1.3</Version>
-    <PackageReadmeFile>README</PackageReadmeFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/kasparboelkjeldsen/Knowit.Umbraco.Dictionoid</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/kasparboelkjeldsen/Knowit.Umbraco.Dictionoid</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Authors>KasparBoelKjeldsen</Authors>
+    <Company>Knowit Experience Copenhagen</Company>
+    <Copyright>Kaspar Boel Kjeldsen</Copyright>
   </PropertyGroup>
   
   <ItemGroup>
@@ -25,13 +31,6 @@
   <ItemGroup>
     <Content Include="App_Plugins\Knowit.Umbraco.Dictionoid\**" ExcludeFromSingleFile="true" CopyToPublishDirectory="Always" />
     <None Include="buildTransitive\**" Pack="true" PackagePath="buildTransitive" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="README">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
   </ItemGroup>
 
 	<ItemGroup>
@@ -48,6 +47,10 @@
 			<CopyToPublishDirectory>Always</CopyToPublishDirectory>
 			<PackageCopyToOutput>true</PackageCopyToOutput>
 			<Pack>true</Pack>
+		</None>
+		<None Update="README.md">
+		  <Pack>True</Pack>
+		  <PackagePath>\</PackagePath>
 		</None>
 	</ItemGroup>
 
