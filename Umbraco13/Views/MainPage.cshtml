@@ -6,9 +6,8 @@
 }
 
 <ul>
-	<li>@await Umbraco.Dictionoid("This is a test of \"Dictionoid\"", "knowit.test")</li>
-	<li>@await Umbraco.Dictionoid("This is ANOTHER test of \"Dictionoid\"", "knowit.test2")</li>
-	<li>@await Umbraco.Dictionoid("This key didn't exist in the dictionary when I pressed the button.", "knowit.test3")</li>
-
-	<li>@await Umbraco.Dictionoid("This key didn't exist in the dictionary when I pressed the button either!", "knowit.test4")</li>
+	<li>
+		@Umbraco.GetDictionaryValue("knowit.imlazy")
+		@Umbraco.GetDictionaryValue("knowit.mads")
+	</li>
 </ul>

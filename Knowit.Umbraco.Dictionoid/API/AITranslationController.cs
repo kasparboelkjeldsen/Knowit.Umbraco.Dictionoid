@@ -1,46 +1,23 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Web.Common.Attributes;
-using Umbraco.Cms.Web.BackOffice.Controllers;
-using System.Text.Json;
-using System.Text;
-using Umbraco.Cms.Web.Common.Controllers;
-using Newtonsoft.Json;
-using System.Net.Http.Headers;
-using OpenAI_API.Chat;
+﻿using Knowit.Umbraco.Dictionoid.DTO;
 using Microsoft.AspNetCore.Authorization;
-using Umbraco.Cms.Web.Common.Authorization;
-using Org.BouncyCastle.Asn1;
-using Microsoft.Extensions.Hosting;
-using NPoco.fastJSON;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Net.NetworkInformation;
-using Umbraco.Cms.Core.Deploy;
-using Umbraco.Cms.Infrastructure.Scoping;
-using MimeKit.Cryptography;
-using System.Globalization;
-using Umbraco.Cms.Core.Cache;
-using Umbraco.Extensions;
-using static System.Formats.Asn1.AsnWriter;
-using Umbraco.Cms.Infrastructure.Persistence;
-using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using OpenAI_API.Chat;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json.Linq;
-using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Extensions;
 using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
-using NPoco;
-using Knowit.Umbraco.Dictionoid.DTO;
-using Umbraco.Cms.Core.Models.Membership;
 
 namespace Knowit.Umbraco.Dictionoid.API
 {
-    
-    public class AITranslationController : UmbracoApiController
+
+	public class AITranslationController : UmbracoApiController
     {
         private readonly string? ApiKey = string.Empty;
         private readonly bool Cleanup = false;

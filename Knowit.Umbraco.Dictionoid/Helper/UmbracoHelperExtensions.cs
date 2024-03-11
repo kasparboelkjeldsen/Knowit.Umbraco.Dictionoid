@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common;
-using Umbraco.Cms.Core.DependencyInjection;
+
 using Umbraco.Extensions;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using System.Text.RegularExpressions;
+using Knowit.Umbraco.Dictionoid.ServiceResolver;
 
 namespace Knowit.Umbraco.Dictionoid.Helper
 {
@@ -97,12 +98,13 @@ namespace Knowit.Umbraco.Dictionoid.Helper
 
 		private static (ILocalizationService, IDictionaryRepository, IScopeProvider, IConfiguration, IWebHostEnvironment, ITemplateRepository)? GetRequiredServices()
 		{
-			var localizationService = (ILocalizationService)StaticServiceProvider.Instance.GetService(typeof(ILocalizationService));
-			var dictionaryRepository = (IDictionaryRepository)StaticServiceProvider.Instance.GetService(typeof(IDictionaryRepository));
-			var scopeProvider = (IScopeProvider)StaticServiceProvider.Instance.GetService(typeof(IScopeProvider));
-			var configuration = (IConfiguration)StaticServiceProvider.Instance.GetService(typeof(IConfiguration));
-			var templateRepository = (ITemplateRepository)StaticServiceProvider.Instance.GetService(typeof(ITemplateRepository));
-			var env = (IWebHostEnvironment)StaticServiceProvider.Instance.GetService(typeof(IWebHostEnvironment));
+			var instance = ServiceProviderHelper.GetServiceProviderInstance();
+			var localizationService = (ILocalizationService)instance.GetService(typeof(ILocalizationService));
+			var dictionaryRepository = (IDictionaryRepository)instance.GetService(typeof(IDictionaryRepository));
+			var scopeProvider = (IScopeProvider)instance.GetService(typeof(IScopeProvider));
+			var configuration = (IConfiguration)instance.GetService(typeof(IConfiguration));
+			var templateRepository = (ITemplateRepository)instance.GetService(typeof(ITemplateRepository));
+			var env = (IWebHostEnvironment)instance.GetService(typeof(IWebHostEnvironment));
 
 			return localizationService == null || dictionaryRepository == null || scopeProvider == null || configuration == null || templateRepository == null || env == null
 				? (null, null, null, null, null, null)

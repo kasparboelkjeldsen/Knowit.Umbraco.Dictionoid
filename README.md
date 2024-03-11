@@ -4,6 +4,8 @@ Dictionoid integrates OpenAI's language capabilities with Umbraco, streamlining 
 By leveraging OpenAI's Completion API and requiring an API key for access, Dictionoid simplifies the management of multilingual content for developers and content managers. 
 Particularly useful for projects requiring localization in multiple languages, it significantly reduces the manual effort of creating translations.
 
+Dictionoid works in Umbraco 10, 11, 12 and 13
+
 ## Features
 
 - **Automatic Translations**: With a simple button click, Dictionoid translates your text into all languages set up in Umbraco, streamlining content localization.
