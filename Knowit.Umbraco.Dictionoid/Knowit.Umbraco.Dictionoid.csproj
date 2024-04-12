@@ -12,7 +12,7 @@
     <Title>Knowit.Umbraco.Dictionoid</Title>
     <Description>Dictionoid is a versatile Umbraco plugin that integrates OpenAI's advanced language capabilities, offering automatic translation, code-first dictionary generation, and history tracking to streamline and enhance multilingual content management.</Description>
     <PackageTags>umbraco;plugin;package;umbraco-marketplace;knowit</PackageTags>
-    <Version>0.2.2</Version>
+    <Version>0.3.0</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageProjectUrl>https://github.com/kasparboelkjeldsen/Knowit.Umbraco.Dictionoid</PackageProjectUrl>
     <RepositoryUrl>https://github.com/kasparboelkjeldsen/Knowit.Umbraco.Dictionoid</RepositoryUrl>

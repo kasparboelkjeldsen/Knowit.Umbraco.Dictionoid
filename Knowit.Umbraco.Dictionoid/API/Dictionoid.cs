@@ -78,8 +78,19 @@ Your final output should be the enriched JSON, with all values filled and any sp
 
 			return success;
 		}
-
-		private static string CombineKeys(string buildKey, string keyPart)
+        internal static dynamic? GetGroupedResults(string key, List<dynamic>? results)
+        {
+            return results
+                .Where(res => res.key == key)
+                .GroupBy(res => new { res.key, res.pk })
+                .Select(g => new
+                {
+                    key = g.Key.key,
+                    id = g.Key.pk,
+                    translations = g.Select(res => new { lang = res.languageISOCode, text = res.value }).ToList()
+                }).FirstOrDefault();
+        }
+        private static string CombineKeys(string buildKey, string keyPart)
 		{
 			return string.IsNullOrEmpty(buildKey) ? keyPart : $"{buildKey}.{keyPart}";
 		}

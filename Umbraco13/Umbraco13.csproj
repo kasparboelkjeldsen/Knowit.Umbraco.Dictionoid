@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Knowit.Umbraco.Dictionoid" Version="0.2.1" />
     <PackageReference Include="Umbraco.Cms" Version="13.1.1" />
   </ItemGroup>
 
@@ -18,6 +17,10 @@
 
   <ItemGroup>
     <Folder Include="App_Plugins\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Knowit.Umbraco.Dictionoid\Knowit.Umbraco.Dictionoid.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

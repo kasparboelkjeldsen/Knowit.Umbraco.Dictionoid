@@ -11,6 +11,7 @@ Dictionoid works in Umbraco 10, 11, 12 and 13
 - **Automatic Translations**: With a simple button click, Dictionoid translates your text into all languages set up in Umbraco, streamlining content localization.
 - **Hover To See Translations**: The package extends the default view of Umbraco's Translate section, to show tranlation-values on hover.
 - **Translation History**: Track changes to your dictionary items, maintaining a record of modifications over time for better version control.
+- **Translation API: get translations for your frontend, and create missing translations.
 - **Code-First Dictionary Generation**: For developers, Dictionoid offers the ability to generate dictionary items directly from code using `@await Umbraco.Dictionoid("My dictionary item", "my.key")`, eliminating the need to manually create items in the Backoffice.
 - **Source Code Integration**: Seamlessly integrates with your Umbraco projects, offering features like dictionary item tracking and source code cleanup post-item creation.
 - **Opt-in Features**: Additional developer-centric functionalities such as tracking history, code cleanup, and code-first generation are opt-in to ensure they are used judiciously, particularly outside production environments.
@@ -34,6 +35,11 @@ For developers seeking to leverage advanced features, the full configuration is 
   "CleanupAfterCreate": false,
   "CleanupInBackoffice": true,
   "TrackHistory":  true
+  "FrontendApi": {
+    "Expose": true,
+    "Secret": "my Secret!",
+    "TranslateOnMissing": true
+  }
 }
 ```
 
@@ -54,6 +60,95 @@ The `CleanupInBackoffice` feature provides a user-friendly interface within Umbr
 ### TrackHistory
 
 The `TrackHistory` functionality addresses a common limitation in Umbraco regarding dictionary item modifications: once a dictionary item is altered, its previous state is typically lost. With `TrackHistory` enabled, Dictionoid creates a new database table, `KnowitDictionoidHistory`, to log every change made to dictionary items. This includes capturing both the old and new values whenever an update occurs. Accessible through the dictionary item editing interface, this history allows developers and content managers to review and revert changes if necessary, providing an invaluable audit trail and enhancing content integrity over time.
+
+### Frontend API
+
+The `FrontendAPI` functionality is enabled by setting `Expose` to true. Put in a secret (so not everyone can call it) and you're good to go.
+
+#### Examples
+<yoursite>/umbraco/api/dictionoid/item?key=knowit.imlazy&fallback=I'm just so lazy
+This will return something like
+```json
+{
+    "key": "knowit.imlazy",
+    "id": 34,
+    "translations": [
+        {
+            "lang": "en-US",
+            "text": "I want to translate this piece of text, but I'm lazy..."
+        },
+        {
+            "lang": "da-DK",
+            "text": "Jeg vil gerne oversætte denne tekst, men jeg er doven..."
+        },
+        {
+            "lang": "sv-SE",
+            "text": "Jag vill översätta den här texten, men jag är lat..."
+        },
+        {
+            "lang": "nb-NO",
+            "text": "Jeg vil oversette denne teksten, men jeg er lat..."
+        }
+    ]
+}
+```
+
+
+If you have enabled `TranslateOnMissing` and there is no item in the dictionary, translations will be auto created before returning (an object). If not, the fallback will be returned.
+
+Dictinoid also exposes a convinience method to get all items starting with a string, so you can extract all dictionary items for whatever it is you are working on.
+
+<yoursite>/umbraco/api/dictionoid/items?keyStartsWith=knowit.
+
+This will return something like 
+```json
+[
+    {
+        "key": "knowit.doesntexist",
+        "id": 33,
+        "translations": [
+            {
+                "lang": "en-US",
+                "text": "This translation does not exist in the dictionary yet!"
+            },
+            {
+                "lang": "da-DK",
+                "text": "Denne oversættelse findes ikke i ordbogen endnu!"
+            },
+            {
+                "lang": "sv-SE",
+                "text": "Denna översättning finns inte i ordlistan ännu!"
+            },
+            {
+                "lang": "nb-NO",
+                "text": "Denne oversettelsen finnes ikke i ordboken ennå!"
+            }
+        ]
+    },
+    {
+        "key": "knowit.imlazy",
+        "id": 34,
+        "translations": [
+            {
+                "lang": "en-US",
+                "text": "I want to translate this piece of text, but I'm lazy..."
+            },
+            {
+                "lang": "da-DK",
+                "text": "Jeg vil gerne oversætte denne tekst, men jeg er doven..."
+            },
+            {
+                "lang": "sv-SE",
+                "text": "Jag vill översätta den här texten, men jag är lat..."
+            },
+            {
+                "lang": "nb-NO",
+                "text": "Jeg vil oversette denne teksten, men jeg er lat..."
+            }
+        ]
+    }... etc
+]
+```
 
 
 ### CleanupAfterCreate

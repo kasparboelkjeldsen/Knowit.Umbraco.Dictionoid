@@ -1,4 +1,5 @@
 ﻿using Knowit.Umbraco.Dictionoid.DTO;
+using Lucene.Net.QueryParsers.Flexible.Core.Nodes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,9 @@ namespace Knowit.Umbraco.Dictionoid.API
     {
         private readonly string? ApiKey = string.Empty;
         private readonly bool Cleanup = false;
+		private readonly bool ExposeApi = false;
+		private readonly string? FrontendKey = string.Empty;
+		private readonly bool FrontendTranslateOnMissing = false;
         private const string Endpoint = "https://api.openai.com/v1/chat/completions";
 
         private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
@@ -48,18 +52,113 @@ namespace Knowit.Umbraco.Dictionoid.API
 			ApiKey = _configuration.GetValue<string>("Knowit.Umbraco.Dictionoid:ApiKey");
 
             var cleanup = _configuration.GetValue<bool?>("Knowit.Umbraco.Dictionoid:CleanupInBackoffice");
-            
+            var expose = _configuration.GetValue<bool?>("Knowit.Umbraco.Dictionoid:FrontendApi:Expose");
             if (cleanup.HasValue)
                 Cleanup = cleanup.Value;
+
+			if (expose.HasValue)
+			{
+				ExposeApi = expose.Value;
+				FrontendKey = _configuration.GetValue<string?>("Knowit.Umbraco.Dictionoid:FrontendApi:Secret");
+                var translateOnMissing = _configuration.GetValue<bool?>("Knowit.Umbraco.Dictionoid:FrontendApi:TranslateOnMissing");
+				if(translateOnMissing.HasValue)
+				{
+					FrontendTranslateOnMissing = translateOnMissing.Value;
+                 }
+            }
 
 			_webHostEnvironment = webHostEnvironment;
 
 		}
 
-        [HttpGet("umbraco/backoffice/dictionoid/test")]
-        public IActionResult Test()
+		[HttpGet("umbraco/api/dictionoid/item")]
+		public async Task<IActionResult> Item(string key, string fallBack)
         {
-            return Ok("HEJ!");
+            if (!ExposeApi) return NotFound();
+
+            // Extract the bearer token from the Authorization header
+            string authHeader = HttpContext.Request.Headers["Authorization"];
+            if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
+                return BadRequest("Missing or invalid authorization header.");
+
+            // Remove "Bearer " from the start of the string to get the actual token
+            var token = authHeader.Substring("Bearer ".Length).Trim();
+
+            // Compare the extracted token with the FrontendKey
+            if (FrontendKey != token)
+                return BadRequest("Invalid token.");
+
+            List<dynamic>? results = CacheEntireDictionary();
+            dynamic? groupedResults = Dictionoid.GetGroupedResults(key, results);
+
+            if (groupedResults == null && !string.IsNullOrEmpty(fallBack))
+            {
+                if (!FrontendTranslateOnMissing)
+                    return Ok(new
+                    {
+                        key = key,
+                        id = -1,
+                        transations = new dynamic[]
+                            {
+                                new {
+                                    lang = "",
+                                    text = fallBack
+                                }
+                            }
+                    });
+                else
+                {
+                    using (var scope = _scopeProvider.CreateScope())
+                    {
+                        var languages = _localizationService.GetAllLanguages();
+                        var openAIContent = await Dictionoid.GetTranslationResult(fallBack, languages, ApiKey);
+                        var success = Dictionoid.UpdateDictionaryItems(key, languages, _localizationService, _dictionaryRepository, openAIContent);
+                    }
+
+                    _appCache.ClearByKey("allDictionaryItems");
+                    results = CacheEntireDictionary();
+
+                    groupedResults = Dictionoid.GetGroupedResults(key, results);
+                    return Ok(groupedResults ?? null);
+                }
+            }
+            // If no results are found for the given key, return an empty structure
+            else return Ok(groupedResults ?? null);
+        }
+
+        
+
+        [HttpGet("umbraco/api/dictionoid/items")]
+        public IActionResult Items(string keyStartsWith)
+        {
+            if (!ExposeApi) return NotFound();
+
+            // Extract the bearer token from the Authorization header
+            string authHeader = HttpContext.Request.Headers["Authorization"];
+            if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
+                return BadRequest("Missing or invalid authorization header.");
+
+            // Remove "Bearer " from the start of the string to get the actual token
+            var token = authHeader.Substring("Bearer ".Length).Trim();
+
+            // Compare the extracted token with the FrontendKey
+            if (FrontendKey != token)
+                return BadRequest("Invalid token.");
+
+            List<dynamic>? results = CacheEntireDictionary();
+
+            // Filter and group the results where keys start with the provided argument
+            var groupedResults = results
+                .Where(res => res.key != null && res.key.StartsWith(keyStartsWith))
+                .GroupBy(res => new { res.key, res.pk })
+                .Select(g => new {
+                    key = g.Key.key,
+                    id = g.Key.pk,
+                    translations = g.Select(res => new { lang = res.languageISOCode, text = res.value }).ToList()
+                }).ToList(); // This will create a list of the grouped result objects
+
+            // If no results are found that match the criteria, return an empty list
+            return Ok(groupedResults.Any() ? groupedResults : new List<object>());
         }
 
         [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
@@ -202,6 +301,7 @@ namespace Knowit.Umbraco.Dictionoid.API
 			return Ok(changes);
         }
 
+		[Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
 		[HttpGet("umbraco/backoffice/dictionoid/history")]
 		public async Task<IActionResult> GetDictionidHistory(string key)
 		{
@@ -211,7 +311,7 @@ namespace Knowit.Umbraco.Dictionoid.API
 				return Ok(history);
 			}
 		}
-
+		[Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
 		[HttpGet("umbraco/backoffice/dictionoid/clearhistory")]
 		public async Task<IActionResult> ClearHistory()
 		{
