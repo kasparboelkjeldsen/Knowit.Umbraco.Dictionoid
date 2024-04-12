@@ -333,15 +333,21 @@ function buildNestedList(changesObject) {
 }
 
 function loadScripts(callback) {
-  const popperScript = document.createElement('script');
-  popperScript.src = 'https://unpkg.com/@popperjs/core@2';
-  document.head.appendChild(popperScript);
+    const popperScript = document.createElement('script');
+    popperScript.src = 'https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js';
+    document.head.appendChild(popperScript);
 
-  popperScript.onload = () => {
-    const tippyScript = document.createElement('script');
-    tippyScript.src = 'https://unpkg.com/tippy.js@6';
-    document.head.appendChild(tippyScript);
+    popperScript.onload = () => {
+        const tippyScript = document.createElement('script');
+        tippyScript.src = 'https://cdn.jsdelivr.net/npm/tippy.js@6.3.7/dist/tippy.umd.min.js';
+        document.head.appendChild(tippyScript);
 
-    tippyScript.onload = callback;
-  };
+        const tippyCSS = document.createElement('link');
+        tippyCSS.rel = 'stylesheet';
+        tippyCSS.href = 'https://cdn.jsdelivr.net/npm/tippy.js@6.3.7/dist/tippy.min.css';
+        document.head.appendChild(tippyCSS);
+
+        tippyScript.onload = callback;
+    };
 }
+

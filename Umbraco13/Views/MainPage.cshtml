@@ -8,6 +8,8 @@
 <ul>
 	<li>
 		@Umbraco.GetDictionaryValue("knowit.imlazy")
-		@Umbraco.GetDictionaryValue("knowit.mads")
+	</li>
+	<li>
+		@await Umbraco.Dictionoid("my test", "mykey")
 	</li>
 </ul>
