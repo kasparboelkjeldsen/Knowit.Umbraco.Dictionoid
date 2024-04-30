@@ -1,10 +1,11 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage;
 @using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
-@using Knowit.Umbraco.Dictionoid.Helper;
+@using Knowit.Umbraco.Dictionoid.Extensions;
 @{
 	Layout = null;
 }
 <ul>
-	<li>@await Umbraco.Dictionoid("I'm lazy","knowit.lazy")</li>
+	<li>@Umbraco.GetDictionaryValue("knowit.lazy")</li>
+	<li>@Umbraco.GetDictionaryValue("othertag")</li>
 </ul>

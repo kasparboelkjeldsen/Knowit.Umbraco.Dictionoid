@@ -16,11 +16,30 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="App_Plugins\" />
+    <ProjectReference Include="..\Knowit.Umbraco.Dictionoid\Knowit.Umbraco.Dictionoid.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Knowit.Umbraco.Dictionoid\Knowit.Umbraco.Dictionoid.csproj" />
+    <Content Include="App_Plugins\Knowit.Umbraco.Dictionoid\dictionoid.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+    <Content Include="App_Plugins\Knowit.Umbraco.Dictionoid\dictionoid.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+    <Content Include="App_Plugins\Knowit.Umbraco.Dictionoid\package.manifest">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+    <Content Include="App_Plugins\Knowit.Umbraco.Dictionoid\views\dictionoid.edit.html">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+    <Content Include="App_Plugins\Knowit.Umbraco.Dictionoid\views\dictionoid.list.html">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
   <PropertyGroup>

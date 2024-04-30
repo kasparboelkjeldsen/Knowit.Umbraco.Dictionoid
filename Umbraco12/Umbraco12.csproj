@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Knowit.Umbraco.Dictionoid" Version="0.1.7" />
     <PackageReference Include="Umbraco.Cms" Version="12.3.7" />
   </ItemGroup>
 
@@ -14,6 +13,15 @@
     <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
     <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
     <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App_Plugins\Knowit.Umbraco.Dictionoid\**">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Knowit.Umbraco.Dictionoid\Knowit.Umbraco.Dictionoid.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

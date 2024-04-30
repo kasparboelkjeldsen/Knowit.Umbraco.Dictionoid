@@ -1,0 +1,46 @@
+<div>
+    <div class="umb-pane" style="margin-left:0">
+        <div class="umb-pane-content">
+            <div class="umb-pane-sub-views">
+                <div class="umb-editor-sub-view">
+                    <div class="umb-editor-sub-view__content">
+                        <div class="umb-box ng-scope">
+                            <div class="umb-box-content dictionoid-box-content">
+                                <strong>
+                                    Dictionoid
+                                </strong>
+                                <em> - by Knowit</em>
+                                <hr>
+                                <textarea ng-model="ctrl.color"
+                                        rows="2" class="autogrow w-100 dictionoid-color"style="height: 53px; min-height: 0px;" placeholder="You can color the translation here. For example: 'Keep it formal' or 'light and lose tone'"></textarea>
+                                <hr>
+                                <button ng-disabled="ctrl.isButtonDisabled"
+                                        ng-click="ctrl.translate()"
+                                        type="button"
+                                        class="dictionoid-button btn umb-button__button btn-warning umb-button-- umb-outline"> <span class="umb-button__content"> Translate missing fields </span> </button>
+
+                                <ul class="umb-load-indicator animated -half-second dictionoid-loading" style="display:none">
+                                    <li class="umb-load-indicator__bubble"></li>
+                                    <li class="umb-load-indicator__bubble"></li>
+                                    <li class="umb-load-indicator__bubble"></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="history" ng-if="ctrl.changes.length > 0">
+        <hr />
+        <strong>History</strong>
+        <div ng-repeat="change in ctrl.changes">
+            <div style="margin-top:20px; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 5px; background-color: #f9f9f9;">
+                <em>Timestamp: {{change.timestamp}}</em>
+                <br />
+                <strong style="color: #333; margin-bottom: 5px;">{{change.key}} value was:</strong>
+                <span style="color: #555; margin: 0; padding: 0;"> {{change.value}}</span>
+            </div>
+        </div>
+    </div>
+</div>

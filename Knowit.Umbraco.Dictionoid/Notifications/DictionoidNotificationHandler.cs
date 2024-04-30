@@ -1,83 +1,62 @@
-﻿using Knowit.Umbraco.Dictionoid.DTO;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.DependencyInjection;
+using Knowit.Umbraco.Dictionoid.AiClients.Configurations;
+using Knowit.Umbraco.Dictionoid.Database;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Scoping;
 
-namespace Knowit.Umbraco.Dictionoid.Notifications
+namespace Knowit.Umbraco.Dictionoid.Notifications;
+
+public class DictionoidNotificationHandler : INotificationAsyncHandler<DictionaryItemSavingNotification>
 {
-	public class NotificationHandlersComposer : IComposer
-	{
-		public void Compose(IUmbracoBuilder builder)
-		{
-			builder.AddNotificationAsyncHandler<DictionaryItemSavingNotification, DictionoidNotificationHandler>();
-		}
-	}
-	public class DictionoidNotificationHandler : INotificationAsyncHandler<DictionaryItemSavingNotification>
-	{
-		private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
-		private readonly IConfiguration _configuration;
-		public DictionoidNotificationHandler(IUmbracoDatabaseFactory umbracoDatabaseFactory, IConfiguration configuration)
-		{
-			_umbracoDatabaseFactory = umbracoDatabaseFactory;
-			_configuration = configuration;
-		}
+    private readonly DictionoidConfiguration _configuration;
+    private readonly IDictionoidHistoryRepository _historyRepository;
+    private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
 
+    public DictionoidNotificationHandler(IOptions<DictionoidConfiguration> configuration,
+        IDictionoidHistoryRepository historyRepository, IUmbracoDatabaseFactory umbracoDatabaseFactory)
+    {
+        _historyRepository = historyRepository;
+        _umbracoDatabaseFactory = umbracoDatabaseFactory;
+        _configuration = configuration.Value;
+    }
 
-		public Task HandleAsync(DictionaryItemSavingNotification notification, CancellationToken cancellationToken)
-		{
-			var shouldTrack = _configuration.GetValue<bool?>("Knowit.Umbraco.Dictionoid:TrackHistory");
-			if (!shouldTrack.HasValue || !shouldTrack.Value) return Task.CompletedTask;
-			var now = DateTime.Now;
-			using (var db = _umbracoDatabaseFactory.CreateDatabase())
-			{
-				foreach (var entity in notification.SavedEntities)
-				{
-					List<DictionoidHistory> entries = new List<DictionoidHistory>();
+    public Task HandleAsync(DictionaryItemSavingNotification notification, CancellationToken cancellationToken)
+    {
+        var shouldTrack = _configuration.TrackHistory;
+        if (!shouldTrack) return Task.CompletedTask;
 
-					foreach (var translation in entity.Translations)
-					{
-						try
-						{
-							var dyn = db.Fetch<dynamic>(@"
-SELECT d.[value]
-FROM cmsLanguageText d
-JOIN umbracoLanguage l ON d.languageId = l.id
-JOIN cmsDictionary i ON i.id = d.uniqueId
-where [key] = @key
-and languageIsoCode = @iso
-", new { key = entity.ItemKey, iso = translation.Language.IsoCode }).FirstOrDefault();
-						
-						if (dyn == null) continue;
+        var now = DateTime.Now;
 
-						var historyEntry = new DictionoidHistory
-						{
-							Key = entity.ItemKey,
-							LanguageIsoCode = translation.Language.IsoCode,
-							LanguageCultureName = translation.Language.CultureName,
-							Value = dyn.value,
-							Timestamp = now,
-						};
-						
-							db.Insert("KnowitDictionoidHistory", "id", historyEntry);
-						}
-						catch (Exception e)
-						{
-							// todo log failure
-						}
-					}
-				}
-			}
-			return Task.CompletedTask;
-		}
-	}
+        foreach (var entity in notification.SavedEntities)
+        {
+            foreach (var translation in entity.Translations)
+            {
+                try
+                {
+                    var value = _historyRepository.GetValueByKeyAndLanguage(entity.ItemKey, translation.Language.IsoCode);
+
+                    if (value == null) continue;
+
+                    var historyEntry = new DictionoidHistory
+                    {
+                        Key = entity.ItemKey,
+                        LanguageIsoCode = translation.Language.IsoCode,
+                        LanguageCultureName = translation.Language.CultureName,
+                        Value = value,
+                        Timestamp = now,
+                    };
+
+                    _historyRepository.Save(historyEntry);
+                }
+                catch
+                {
+                    // todo log failure
+                }
+            }
+        }
+
+        return Task.CompletedTask;
+    }
 }
