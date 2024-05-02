@@ -37,7 +37,7 @@ public class DictionoidComposer : IComposer
                 builder.Config.GetSection(AzureAiApiConfiguration.SectionName));
 
             builder.Services.Configure<DictionoidConfiguration>(
-                builder.Config.GetSection(ChatGptApiConfiguration.SectionName));
+                builder.Config.GetSection(AzureAiApiConfiguration.SectionName));
 
             builder.Services.AddSingleton<IAiClient, AzureAiClient>();
         }
