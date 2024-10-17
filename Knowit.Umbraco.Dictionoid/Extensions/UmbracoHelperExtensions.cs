@@ -14,64 +14,65 @@ namespace Knowit.Umbraco.Dictionoid.Extensions
 {
     public static class UmbracoHelperExtensions
     {
-        /// <summary>
-        /// Returns localized dictionary translation if it exists, and creates it when it doesn't.
-        /// Will use OpenAI to translate into every language set up in Umbraco - results may vary.
-        ///
-        /// Defaults to return "text" parameter if something goes wrong.
-        /// </summary>
-        /// <param name="helper"></param>
-        /// <param name="text"></param>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public static async Task<string?> Dictionoid(this UmbracoHelper helper, string text, string key)
-        {
-            if (string.IsNullOrEmpty(key)) return string.Empty;
+		/// <summary>
+		/// Returns localized dictionary translation if it exists, and creates it when it doesn't.
+		/// Will use OpenAI to translate into every language set up in Umbraco - results may vary.
+		///
+		/// Defaults to return "text" parameter if something goes wrong.
+		/// </summary>
+		/// <param name="helper"></param>
+		/// <param name="text"></param>
+		/// <param name="key"></param>
+		/// <returns></returns>
+		public static string? Dictionoid(this UmbracoHelper helper, string text, string key)
+		{
+			if (string.IsNullOrEmpty(key)) return string.Empty;
 
-            // check if key already exists, and use default behavior if it does
-            var helperVal = helper.GetDictionaryValue(key);
+			// check if key already exists, and use default behavior if it does
+			var helperVal = helper.GetDictionaryValue(key);
 
-            if (!string.IsNullOrEmpty(helperVal)) return helperVal;
+			if (!string.IsNullOrEmpty(helperVal)) return helperVal;
 
-            // time for crazy.
-            // this is kinda dangerous, but how else do you get the required services in a static helper class?
-            var services = GetRequiredServices();
+			// time for crazy.
+			// this is kinda dangerous, but how else do you get the required services in a static helper class?
+			var services = GetRequiredServices();
 
-            if (services is null) return text;
+			if (services is null) return text;
 
-            var (localizationService,
-                dictionaryRepository,
-                scopeProvider,
-                configuration,
-                env,
-                templating,
-                dictionoidService) = services.Value;
+			var (localizationService,
+				dictionaryRepository,
+				scopeProvider,
+				configuration,
+				env,
+				templating,
+				dictionoidService) = services.Value;
 
-            // get configuration values
-            var shouldCleanup = configuration!.CleanupAfterCreate;
-            var shouldCreate = configuration.CreateOnNotExist;
+			// get configuration values
+			var shouldCleanup = configuration!.CleanupAfterCreate;
+			var shouldCreate = configuration.CreateOnNotExist;
 
-            // abort if we shouldn't make a new dictionary item
-            if (!shouldCreate) return text;
+			// abort if we shouldn't make a new dictionary item
+			if (!shouldCreate) return text;
 
-            // get every language set up in Umbraco.
-            var languages = localizationService.GetAllLanguages().ToList();
+			// get every language set up in Umbraco.
+			var languages = localizationService.GetAllLanguages().ToList();
 
-            // perform OpenAI translation
-            var translationResult =  await dictionoidService.GetTranslationResult(text, languages);
+			// perform OpenAI translation (synkron version af det tidligere async-opkald)
+			var translationResult = Task.Run(() => dictionoidService.GetTranslationResult(text, languages)).Result;
+			if (string.IsNullOrEmpty(translationResult)) return text;
 
-            if (string.IsNullOrEmpty(translationResult)) return text;
+			using var scope = scopeProvider.CreateScope();
+			var success = dictionoidService.UpdateDictionaryItems(key, languages, localizationService,
+				dictionaryRepository, translationResult);
+			scope.Complete();
+			if (shouldCleanup)
+				DoCleanup(helper.AssignedContentItem.TemplateId, key, scopeProvider, templating, env);
 
-            using var scope = scopeProvider.CreateScope();
-            var success = dictionoidService.UpdateDictionaryItems(key, languages, localizationService,
-                dictionaryRepository, translationResult);
-            scope.Complete();
-            if (shouldCleanup)
-                DoCleanup(helper.AssignedContentItem.TemplateId, key, scopeProvider, templating, env);
-            return success ? helper.GetDictionaryValue(key) : text;
-        }
+			return success ? helper.GetDictionaryValue(key) : text;
+		}
 
-        private static void DoCleanup(int? templateId, string key, IScopeProvider scopeProvider,
+
+		private static void DoCleanup(int? templateId, string key, IScopeProvider scopeProvider,
             ITemplateRepository templateRepository, IWebHostEnvironment env)
         {
             using var scope = scopeProvider.CreateScope();
