@@ -191,6 +191,34 @@ public class DictionoidService : IDictionoidService
 	public bool UpdateDictionaryItems(string key, List<ILanguage> languages,
 		ILocalizationService localizationService, IDictionaryRepository dictionaryRepository, string content)
 	{
+
+		if (_configuration.DisableAi)
+		{
+			// If AI is disabled, content is treated as a plain string, not JSON.
+			var dictionaryItem = localizationService.GetDictionaryItemByKey(key);
+
+			if (dictionaryItem is null)
+			{
+				// Create the dictionary item if it doesn't exist.
+				var newItem = localizationService.CreateDictionaryItemWithIdentity(key, null);
+				if (newItem == null) return false;
+
+				// Update the dictionary item values using the plain string content.
+				foreach (var lang in languages)
+				{
+					localizationService.AddOrUpdateDictionaryValue(newItem, lang, content);
+				}
+
+				// Save the new dictionary item to the repository.
+				dictionaryRepository.Save(newItem);
+				return true; // Dictionary item created and saved.
+			}
+			else
+			{
+				// If the dictionary item exists, you might update it or return false.
+				return false; // Or handle updates as needed.
+			}
+		}
 		var jObject = JObject.Parse(content);
 
 		if (!string.IsNullOrEmpty(key) && key.Contains("."))
@@ -372,8 +400,7 @@ public class DictionoidService : IDictionoidService
 
 	public bool IsAiDisabled()
 	{
-		var s = _configuration.DisableAi;
-		return _configuration.DisableAi;
+	 return _configuration.DisableAi;
 	}
 
 	#endregion
