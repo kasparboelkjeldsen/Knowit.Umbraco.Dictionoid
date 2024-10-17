@@ -1,5 +1,5 @@
 <div>
-    <div class="umb-pane" style="margin-left:0">
+    <div class="umb-pane" ng-if="!ctrl.disableTranslation" style="margin-left:0">
         <div class="umb-pane-content">
             <div class="umb-pane-sub-views">
                 <div class="umb-editor-sub-view">
@@ -12,12 +12,14 @@
                                 <em> - by Knowit</em>
                                 <hr>
                                 <textarea ng-model="ctrl.color"
-                                        rows="2" class="autogrow w-100 dictionoid-color"style="height: 53px; min-height: 0px;" placeholder="You can color the translation here. For example: 'Keep it formal' or 'light and lose tone'"></textarea>
+                                          rows="2" class="autogrow w-100 dictionoid-color" style="height: 53px; min-height: 0px;" placeholder="You can color the translation here. For example: 'Keep it formal' or 'light and lose tone'"></textarea>
                                 <hr>
-                                <button ng-disabled="ctrl.isButtonDisabled"
-                                        ng-click="ctrl.translate()"
+
+                                <button ng-click="ctrl.translate()"
                                         type="button"
-                                        class="dictionoid-button btn umb-button__button btn-warning umb-button-- umb-outline"> <span class="umb-button__content"> Translate missing fields </span> </button>
+                                        class="dictionoid-button btn umb-button__button btn-warning umb-button-- umb-outline">
+                                    <span class="umb-button__content"> Translate missing fields </span>
+                                </button>
 
                                 <ul class="umb-load-indicator animated -half-second dictionoid-loading" style="display:none">
                                     <li class="umb-load-indicator__bubble"></li>

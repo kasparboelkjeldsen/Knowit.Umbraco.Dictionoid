@@ -118,7 +118,7 @@ public class DictionoidService : IDictionoidService
 				using var scope = _scopeProvider.CreateScope();
 				var languages = _localizationService.GetAllLanguages().ToList();
 
-				var openAiContent = _configuration.DisableAi ? "" : await GetTranslationResult(value, languages);
+				var openAiContent = _configuration.HasApiKey ? await GetTranslationResult(value, languages) : "" ;
 
 				var success = UpdateDictionaryItems(key, languages, _localizationService, _dictionaryRepository, openAiContent);
 
@@ -192,7 +192,7 @@ public class DictionoidService : IDictionoidService
 		ILocalizationService localizationService, IDictionaryRepository dictionaryRepository, string content)
 	{
 
-		if (_configuration.DisableAi)
+		if (!_configuration.HasApiKey)
 		{
 			// If AI is disabled, content is treated as a plain string, not JSON.
 			var dictionaryItem = localizationService.GetDictionaryItemByKey(key);
@@ -249,7 +249,7 @@ public class DictionoidService : IDictionoidService
 
 	public async Task<string> GetTranslationResult(string text, IEnumerable<ILanguage> languages)
 	{
-		if (_configuration.DisableAi) return "";
+		if (!_configuration.HasApiKey) return text;
 		var request = CreateTranslationRequest(text, languages);
 		return await Translate(request);
 	}
@@ -398,9 +398,9 @@ public class DictionoidService : IDictionoidService
 		}
 	}
 
-	public bool IsAiDisabled()
+	public bool DisableTranslation()
 	{
-	 return _configuration.DisableAi;
+	 return !_configuration.HasApiKey;
 	}
 
 	#endregion
