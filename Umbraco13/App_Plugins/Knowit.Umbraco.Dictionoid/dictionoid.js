@@ -8,7 +8,7 @@
             controllerAs: 'ctrl',
             templateUrl: '/App_Plugins/Knowit.Umbraco.Dictionoid/views/dictionoid.edit.html'
         };
-    })
+    });
 
     angular.module('umbraco').directive('umbDictionoidList', function () {
         return {
@@ -18,7 +18,7 @@
             controllerAs: 'ctrl',
             templateUrl: '/App_Plugins/Knowit.Umbraco.Dictionoid/views/dictionoid.list.html'
         };
-    })
+    });
 
     angular.module('umbraco').directive('tip', function () {
         return {
@@ -33,33 +33,35 @@
                             languageCultureName: d.languageCultureName,
                             value: d.value,
                             key: d.key
-                        }))
+                        }));
                         $scope.$broadcast("Data_Ready");
-                    })
+                    });
             },
             controllerAs: 'ctrl',
-            link: function (scope, element, attrs) {
+            link: function (scope, element) {
                 scope.$on("Data_Ready", function () {
                     var item = scope.ctrl.items.find(i => i.languageCultureName === scope.$parent.column.displayName && i.key === scope.$parent.$parent.item.name);
                     scope.tip = (item && item.value) ? item.value : 'No translation available.';
                     var tooltip = '<span class="tip">' + scope.tip + '</span>';
                     element.append(tooltip);
-                    element.children().first().bind('mouseenter mouseleave', function () { element.children(".tip").toggleClass('active'); });
+                    element.children().first().bind('mouseenter mouseleave', function () {
+                        element.children(".tip").toggleClass('active');
+                    });
                 });
             }
-        }
+        };
     });
 
-    angular.module('umbraco').controller('DictionoidListController', function ($http, $controller, $scope) {
-        self = this;
+    angular.module('umbraco').controller('DictionoidListController', function ($http, $scope) {
+        var self = this; // Brug 'var' for at definere 'self'
 
-        self.baseCtrl = $scope.vm
+        self.baseCtrl = $scope.vm;
         angular.extend(self, self.baseCtrl);
 
-        const DEFAULT_FEEADBACK = " - This will modify the code in your views!";
+        const DEFAULT_FEEDBACK = " - This will modify the code in your views!";
         const RESPONSE_FEEDBACK = "Your code might have been modified. If new keys have been created, you might need to restart Umbraco.";
 
-        self.feedback = DEFAULT_FEEADBACK;
+        self.feedback = DEFAULT_FEEDBACK;
         self.showConfirmButton = false;
         self.showCleanupButton = true;
         self.changes = [];
@@ -68,7 +70,7 @@
         self.confirm = function () {
             self.showConfirmButton = true;
             self.showCleanupButton = false;
-        }
+        };
 
         self.cleanup = function () {
             self.loading = true;
@@ -81,74 +83,88 @@
                     self.showConfirmButton = false;
                     self.feedback = RESPONSE_FEEDBACK;
                 });
-        }
+        };
 
+        // Clear cache on initialization
         $http.get("/umbraco/backoffice/dictionoid/clearcache");
         $http.get(`/umbraco/backoffice/dictionoid/shouldcleanup`)
             .then(response => self.shouldCleanup = response.data);
     });
 
-    angular.module('umbraco').controller('DictionoidEditController', function ($http, $controller, $scope) {
-        self = this;
+    angular.module('umbraco').controller('DictionoidEditController', function ($http, $scope, IsAiDisabled) {
+        var self = this; // Brug 'var' for at definere 'self'
 
-        self.baseCtrl = $scope.vm
+        self.baseCtrl = $scope.vm;
         angular.extend(self, self.baseCtrl);
 
         self.color = "";
         self.isButtonDisabled = false;
-        self.changes = []
-        self.AiDisabled = true;            ;
+        self.changes = [];
+        self.aiDisabled = true; // Korrekt navngivning
+
         IsAiDisabled.check().then(function (response) {
-            self.AiDisabled = response;  
+            self.aiDisabled = response; // Brug 'aiDisabled' her
         });
-    })
-        .service('IsAiDisabled', function () {
+
+        self.translate = function () {
+            self.isButtonDisabled = true;
+
+            var data = {
+                color: self.color,
+                items: self.baseCtrl.content.translations.map(item => ({
+                    value: item.translation,
+                    id: item.isoCode,
+                    key: item.displayName
+                }))
+            };
+
+            $http({
+                method: 'POST',
+                url: '/umbraco/backoffice/dictionoid/translate',
+                headers: { 'Content-Type': 'application/json' },
+                data: data
+            }).then(function (response) {
+                self.baseCtrl.content.translations = self.baseCtrl.content.translations.map(t => {
+                    var found = response.data.Items.find(i => i.Key === t.displayName);
+                    if (found) {
+                        t.translation = found.Value;
+                    }
+                    return t;
+                });
+            }).finally(function () {
+                self.isButtonDisabled = false;
+            });
+        };
+
+        self.getHistory = function () {
+            $http.get('/umbraco/backoffice/dictionoid/history?key=' + self.baseCtrl.content.name)
+                .then(function (response) {
+                    self.changes = response.data;
+                });
+        };
+
+        $scope.$watch(
+            function () { return self.baseCtrl.content?.name; },
+            function (newValue) {
+                if (newValue) {
+                    self.getHistory();
+                }
+            }
+        );
+    });
+
+    angular.module('umbraco').service('IsAiDisabled', function ($http) {
+        this.check = function () {
             return $http.get('/umbraco/backoffice/dictionoid/isaidisabled')
                 .then(function (response) {
-                    return response.data; 
-                }, function (error) {
-                    console.error('Fejl ved kald til API', error);
-                    return false;
+                    return response.data;
                 })
-            self.translate = function () {
-                self.isButtonDisabled = true;
-
-                var data = {
-                    color: self.color,
-                    items: self.baseCtrl.content.translations.map(item => ({
-                        value: item.translation,
-                        id: item.isoCode,
-                        key: item.displayName
-                    }))
-                };
-
-                $http({
-                    method: 'POST',
-                    url: '/umbraco/backoffice/dictionoid/translate',
-                    headers: { 'Content-Type': 'application/json' },
-                    data: data
-                }).then(function (response) {
-                    self.baseCtrl.content.translations = self.baseCtrl.content.translations.map(t => {
-                        t.translation = response.data.Items.find(i => i.Key === t.displayName).Value;
-                        return t;
-                    });
-                }).finally(function () {
-                    self.isButtonDisabled = false;
+                .catch(function (error) {
+                    console.error('Fejl ved kald til API', error);
+                    return false; // Return false ved fejl
                 });
-            }
-
-            self.getHistory = function () {
-                $http.get('/umbraco/backoffice/dictionoid/history?key=' + self.baseCtrl.content.name)
-                    .then(function (response) {
-                        self.changes = response.data;
-                    });
-            }
-
-            $scope.$watch(
-                function () { return self.baseCtrl.content?.name; },
-                function (newValue, oldValue) { newValue && self.getHistory() }
-            )
-        });
+        };
+    });
 
     angular.module('umbraco.services').config([
         "$httpProvider",
