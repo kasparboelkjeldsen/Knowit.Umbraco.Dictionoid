@@ -100,10 +100,10 @@
         self.color = "";
         self.isButtonDisabled = false;
         self.changes = [];
-        self.aiDisabled = true; // Korrekt navngivning
+        self.disableTranslation = true; // Korrekt navngivning
 
-        IsAiDisabled.check().then(function (response) {
-            self.aiDisabled = response; // Brug 'aiDisabled' her
+        DisableTranslation.check().then(function (response) {
+            self.disableTranslation = response; // Brug 'aiDisabled' her
         });
 
         self.translate = function () {
@@ -153,9 +153,9 @@
         );
     });
 
-    angular.module('umbraco').service('IsAiDisabled', function ($http) {
+    angular.module('umbraco').service('DisableTranslation', function ($http) {
         this.check = function () {
-            return $http.get('/umbraco/backoffice/dictionoid/isaidisabled')
+            return $http.get('/umbraco/backoffice/dictionoid/disabletranslation')
                 .then(function (response) {
                     return response.data;
                 })

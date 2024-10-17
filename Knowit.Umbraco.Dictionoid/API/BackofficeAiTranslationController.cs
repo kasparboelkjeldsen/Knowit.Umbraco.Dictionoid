@@ -35,10 +35,10 @@ namespace Knowit.Umbraco.Dictionoid.API
             return Ok();
         }
 		[Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
-		[HttpGet("umbraco/backoffice/dictionoid/isaidisabled")]
-		public async Task<IActionResult> IsAiDisabled()
+		[HttpGet("umbraco/backoffice/dictionoid/disabletranslation")]
+		public async Task<IActionResult> DisableTranslation()
 		{
-			return Ok(_dictionoidService.IsAiDisabled());
+			return Ok(_dictionoidService.DisableTranslation());
 		}
 
 		[Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
