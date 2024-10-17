@@ -20,6 +20,11 @@ public class DictionoidComposer : IComposer
             return;
         }
 
+        if (azureEnabled && chatGptEnabled)
+        {
+            throw new InvalidOperationException("Both Azure and ChatGPT AI services cannot be enabled at the same time.");
+        }
+
         if (chatGptEnabled)
         {
             builder.Services.Configure<ChatGptApiConfiguration>(
@@ -31,7 +36,7 @@ public class DictionoidComposer : IComposer
             builder.Services.AddSingleton<IAiClient, ChatGptClient>();
         }
 
-        if (azureEnabled)
+        else
         {
             builder.Services.Configure<AzureAiApiConfiguration>(
                 builder.Config.GetSection(AzureAiApiConfiguration.SectionName));
