@@ -1,4 +1,4 @@
-﻿(function(){
+﻿(function () {
 
     angular.module('umbraco').directive('umbDictionoidEdit', function () {
         return {
@@ -20,11 +20,11 @@
         };
     })
 
-    angular.module('umbraco').directive('tip', function() {
+    angular.module('umbraco').directive('tip', function () {
         return {
             restrict: 'A',
-            scope: {tip: '@tip'},
-            controller: function ($scope, $http ) {
+            scope: { tip: '@tip' },
+            controller: function ($scope, $http) {
                 var ctrl = this;
                 ctrl.items = [];
                 $http.get("/umbraco/backoffice/dictionoid/getall")
@@ -38,13 +38,13 @@
                     })
             },
             controllerAs: 'ctrl',
-            link: function(scope, element, attrs) {
-                scope.$on("Data_Ready", function  (){
-                    var item = scope.ctrl.items.find(i => i.languageCultureName === scope.$parent.column.displayName && i.key === scope.$parent.$parent.item.name );
+            link: function (scope, element, attrs) {
+                scope.$on("Data_Ready", function () {
+                    var item = scope.ctrl.items.find(i => i.languageCultureName === scope.$parent.column.displayName && i.key === scope.$parent.$parent.item.name);
                     scope.tip = (item && item.value) ? item.value : 'No translation available.';
                     var tooltip = '<span class="tip">' + scope.tip + '</span>';
                     element.append(tooltip);
-                    element.children().first().bind('mouseenter mouseleave', function() { element.children(".tip").toggleClass('active');  });
+                    element.children().first().bind('mouseenter mouseleave', function () { element.children(".tip").toggleClass('active'); });
                 });
             }
         }
@@ -65,17 +65,17 @@
         self.changes = [];
         self.loading = false;
 
-        self.confirm = function() {
+        self.confirm = function () {
             self.showConfirmButton = true;
             self.showCleanupButton = false;
         }
 
-        self.cleanup = function() {
+        self.cleanup = function () {
             self.loading = true;
 
             $http.get(`/umbraco/backoffice/dictionoid/cleanupinspect`)
                 .then(response => {
-                    self.changes = Object.entries(response.data).map(([file,keys]) => ({file, keys}));
+                    self.changes = Object.entries(response.data).map(([file, keys]) => ({ file, keys }));
                 }).finally(() => {
                     self.loading = false;
                     self.showConfirmButton = false;
@@ -96,68 +96,80 @@
 
         self.color = "";
         self.isButtonDisabled = false;
-        self.changes = [];
-
-        self.translate = function() {
-            self.isButtonDisabled = true;
-
-            var data = {
-                color: self.color,
-                items: self.baseCtrl.content.translations.map(item => ({
-                    value: item.translation,
-                    id: item.isoCode,
-                    key: item.displayName
-                }))
-            };
-
-            $http({
-                method: 'POST',
-                url: '/umbraco/backoffice/dictionoid/translate',
-                headers: { 'Content-Type': 'application/json' },
-                data: data
-            }).then(function (response) {
-                self.baseCtrl.content.translations = self.baseCtrl.content.translations.map(t => {
-                    t.translation = response.data.Items.find(i => i.Key === t.displayName).Value;
-                    return t;
-                });
-            }).finally(function() {
-                self.isButtonDisabled = false;
-            });
-        }
-
-        self.getHistory = function() {
-            $http.get('/umbraco/backoffice/dictionoid/history?key=' + self.baseCtrl.content.name)
+        self.changes = []
+        self.AiDisabled = true;            ;
+        IsAiDisabled.check().then(function (response) {
+            self.AiDisabled = response;  
+        });
+    })
+        .service('IsAiDisabled', function () {
+            return $http.get('/umbraco/backoffice/dictionoid/isaidisabled')
                 .then(function (response) {
-                    self.changes = response.data;
+                    return response.data; 
+                }, function (error) {
+                    console.error('Fejl ved kald til API', error);
+                    return false;
+                })
+            self.translate = function () {
+                self.isButtonDisabled = true;
+
+                var data = {
+                    color: self.color,
+                    items: self.baseCtrl.content.translations.map(item => ({
+                        value: item.translation,
+                        id: item.isoCode,
+                        key: item.displayName
+                    }))
+                };
+
+                $http({
+                    method: 'POST',
+                    url: '/umbraco/backoffice/dictionoid/translate',
+                    headers: { 'Content-Type': 'application/json' },
+                    data: data
+                }).then(function (response) {
+                    self.baseCtrl.content.translations = self.baseCtrl.content.translations.map(t => {
+                        t.translation = response.data.Items.find(i => i.Key === t.displayName).Value;
+                        return t;
+                    });
+                }).finally(function () {
+                    self.isButtonDisabled = false;
                 });
-        }
+            }
 
-        $scope.$watch(
-            function () { return self.baseCtrl.content?.name; },
-            function (newValue, oldValue) { newValue && self.getHistory() }
-        )
-    });
+            self.getHistory = function () {
+                $http.get('/umbraco/backoffice/dictionoid/history?key=' + self.baseCtrl.content.name)
+                    .then(function (response) {
+                        self.changes = response.data;
+                    });
+            }
 
-   angular.module('umbraco.services').config([
-       "$httpProvider",
-       function ($httpProvider) {
-           $httpProvider.interceptors.push(['$q', function($q) {
-               return {
-                   'response': function(response) {
-                       if(response.config.url.startsWith('views/dictionary/edit.htm')) {
+            $scope.$watch(
+                function () { return self.baseCtrl.content?.name; },
+                function (newValue, oldValue) { newValue && self.getHistory() }
+            )
+        });
+
+    angular.module('umbraco.services').config([
+        "$httpProvider",
+        function ($httpProvider) {
+            $httpProvider.interceptors.push(['$q', function ($q) {
+                return {
+                    'response': function (response) {
+                        if (response.config.url.startsWith('views/dictionary/edit.htm')) {
                             response.data = response.data.replace('</umb-editor-container>', '<umb-dictionoid-edit></umb-dictionoid-edit></umb-editor-container>');
-                       }
+                        }
 
-                       if(response.config.url.startsWith('views/dictionary/list.htm')) {
-                           response.data = response.data.replace('<umb-editor-container>', '<umb-editor-container><umb-dictionoid-list></umb-dictionoid-list>');
-                           response.data = response.data.replace('<td ng-repeat="column in item.translations',
-                                   '<td tip="" ng-repeat="column in item.translations');
-                       }
+                        if (response.config.url.startsWith('views/dictionary/list.htm')) {
+                            response.data = response.data.replace('<umb-editor-container>', '<umb-editor-container><umb-dictionoid-list></umb-dictionoid-list>');
+                            response.data = response.data.replace('<td ng-repeat="column in item.translations',
+                                '<td tip="" ng-repeat="column in item.translations');
+                        }
 
                         return response || $q.when(response);
-                   }
-               };
-           }]);
-       }
-   ]);
+                    }
+                };
+            }]);
+        }
+    ]);
 })();

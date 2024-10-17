@@ -58,7 +58,7 @@ namespace Knowit.Umbraco.Dictionoid.Extensions
             var languages = localizationService.GetAllLanguages().ToList();
 
             // perform OpenAI translation
-            var translationResult = await dictionoidService.GetTranslationResult(text, languages);
+            var translationResult =  await dictionoidService.GetTranslationResult(text, languages);
 
             if (string.IsNullOrEmpty(translationResult)) return text;
 

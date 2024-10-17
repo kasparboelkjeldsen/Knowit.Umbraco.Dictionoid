@@ -34,8 +34,14 @@ namespace Knowit.Umbraco.Dictionoid.API
             _dictionoidService.ClearCache();
             return Ok();
         }
+		[Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
+		[HttpGet("umbraco/backoffice/dictionoid/isaidisabled")]
+		public async Task<IActionResult> IsAiDisabled()
+		{
+			return Ok(_dictionoidService.IsAiDisabled());
+		}
 
-        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
+		[Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
         [HttpGet("umbraco/backoffice/dictionoid/gettext")]
         public async Task<IActionResult> GetText(string key)
         {
