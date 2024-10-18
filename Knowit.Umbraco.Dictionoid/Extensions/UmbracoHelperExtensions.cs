@@ -24,7 +24,7 @@ namespace Knowit.Umbraco.Dictionoid.Extensions
 		/// <param name="text"></param>
 		/// <param name="key"></param>
 		/// <returns></returns>
-		public static string? Dictionoid(this UmbracoHelper helper, string text, string key)
+		public async static Task<string?> Dictionoid(this UmbracoHelper helper, string text, string key)
 		{
 			if (string.IsNullOrEmpty(key)) return string.Empty;
 
@@ -46,7 +46,7 @@ namespace Knowit.Umbraco.Dictionoid.Extensions
 				env,
 				templating,
 				dictionoidService) = services.Value;
-
+				
 			// get configuration values
 			var shouldCleanup = configuration!.CleanupAfterCreate;
 			var shouldCreate = configuration.CreateOnNotExist;
@@ -58,24 +58,24 @@ namespace Knowit.Umbraco.Dictionoid.Extensions
 			var languages = localizationService.GetAllLanguages().ToList();
 
 			// perform OpenAI translation (synkron version af det tidligere async-opkald)
-			var translationResult = Task.Run(() => dictionoidService.GetTranslationResult(text, languages)).Result;
+			var translationResult = await dictionoidService.GetTranslationResult(text, languages);
 			if (string.IsNullOrEmpty(translationResult)) return text;
 
 			using var scope = scopeProvider.CreateScope();
 			var success = dictionoidService.UpdateDictionaryItems(key, languages, localizationService,
 				dictionaryRepository, translationResult);
-			scope.Complete();
-			if (shouldCleanup)
-				DoCleanup(helper.AssignedContentItem.TemplateId, key, scopeProvider, templating, env);
 
+			if (shouldCleanup)
+				DoCleanup(helper.AssignedContentItem.TemplateId, key, templating, env);
+
+			scope.Complete();
 			return success ? helper.GetDictionaryValue(key) : text;
 		}
 
 
-		private static void DoCleanup(int? templateId, string key, IScopeProvider scopeProvider,
+		private static void DoCleanup(int? templateId, string key,
             ITemplateRepository templateRepository, IWebHostEnvironment env)
         {
-            using var scope = scopeProvider.CreateScope();
             var template = templateRepository.Get(templateId.Value);
             var path = (env.ContentRootPath + template.VirtualPath.Replace("/", "\\"));
             var text = File.ReadAllText(path);
