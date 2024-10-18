@@ -81,7 +81,7 @@ namespace Knowit.Umbraco.Dictionoid.Extensions
             var text = File.ReadAllText(path);
 
             // Define the regex pattern to match "@Umbraco.Dictionoid("SOMETEXT", "SOMEKEY")"
-            string pattern = $@"Umbraco\.Dictionoid\(\s*""(.*?)"",\s*""{key}""\s*\)";
+            string pattern = $@"await Umbraco\.Dictionoid\(\s*""(.*?)"",\s*""{key}""\s*\)";
 
             // Replacement pattern now uses the "key" parameter
             string replacement = $"Umbraco.GetDictionaryValue(\"{key}\")";
