@@ -1,0 +1,50 @@
+<div>
+    <div class="umb-pane dictionoid-cleanup" style="margin-left:0">
+    <div class="umb-pane-content">
+        <div class="umb-pane-sub-views">
+            <div class="umb-editor-sub-view">
+                <div class="umb-editor-sub-view__content">
+                    <div class="umb-box ng-scope">
+
+                        <div  class="umb-box-content" ng-show="ctrl.changes.length">
+                            <ul style="padding-top:20px;">
+                                <li ng-repeat="change in ctrl.changes">
+                                    {{change.file}}:
+                                    <ul>
+                                        <li ng-repeat="key in change.keys">{{key}}</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="umb-box-content">
+                            <strong>
+                                Dictionoid
+                            </strong>
+                            <em> - by Knowit</em>
+                            <hr>
+
+                            <button ng-click="ctrl.confirm()" ng-show="ctrl.showCleanupButton"
+                                    type="button"
+                                    class="dictionoid-cleanup-button btn umb-button__button btn-warning umb-button-- umb-outline"> <span class="umb-button__content"> Cleanup Dictionoid Fields </span> </button>
+
+                            <button ng-click="ctrl.cleanup()" ng-show="ctrl.showConfirmButton" ng-disabled="ctrl.loading"
+                                    class="dictionoid-cleanup-button-confirm btn umb-button__button btn-danger umb-button-- umb-outline"> <span class="umb-button__content"> Cleanup Dictionoid Fields (SURE?) </span> </button>
+
+                            <strong class="dictionoid-feedback"><em>{{ctrl.feedback}}</em></strong>
+
+                            <ul ng-show="ctrl.loading"
+                                class="umb-load-indicator animated -half-second dictionoid-loading">
+                                <li class="umb-load-indicator__bubble"></li>
+                                <li class="umb-load-indicator__bubble"></li>
+                                <li class="umb-load-indicator__bubble"></li>
+                            </ul>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>

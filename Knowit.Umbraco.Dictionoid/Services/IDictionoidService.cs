@@ -25,4 +25,5 @@ public interface IDictionoidService
     bool UpdateDictionaryItems(string key, List<ILanguage> languages,
         ILocalizationService localizationService, IDictionaryRepository dictionaryRepository, string content);
     List<CachedDictionaryItem>? CacheEntireDictionary();
+	bool DisableTranslation();
 }

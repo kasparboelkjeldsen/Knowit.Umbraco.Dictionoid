@@ -24,35 +24,37 @@
     </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
-        <PackageReference Include="OpenAI" Version="1.10.0"/>
-        <PackageReference Include="Umbraco.Cms.Web.Website" Version="[10.0.0,11.0.0)"/>
-        <PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="[10.0.0,11.0.0)"/>
+        <PackageReference Include="OpenAI" Version="1.10.0" />
+        <PackageReference Include="Umbraco.Cms.Web.Website" Version="[10.0.0,11.0.0)" />
+        <PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="[10.0.0,11.0.0)" />
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
-        <PackageReference Include="OpenAI" Version="1.10.0"/>
-        <PackageReference Include="Umbraco.Cms.Web.Website" Version="[11.0.0,13.0.0)"/>
-        <PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="[11.0.0,13.0.0)"/>
+        <PackageReference Include="OpenAI" Version="1.10.0" />
+        <PackageReference Include="Umbraco.Cms.Web.Website" Version="[11.0.0,13.0.0)" />
+        <PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="[11.0.0,13.0.0)" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-        <PackageReference Include="OpenAI" Version="1.10.0"/>
-        <PackageReference Include="Umbraco.Cms.Web.Website" Version="[13.0.0,14.0.0)"/>
-        <PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="[13.0.0,14.0.0)"/>
+        <PackageReference Include="OpenAI" Version="1.10.0" />
+        <PackageReference Include="Umbraco.Cms.Web.Website" Version="[13.0.0,14.0.0)" />
+        <PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="[13.0.0,14.0.0)" />
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="App_Plugins\Knowit.Umbraco.Dictionoid\**" ExcludeFromSingleFile="true" CopyToPublishDirectory="Always"/>
-        <None Include="buildTransitive\**" Pack="true" PackagePath="buildTransitive"/>
+        <Content Include="App_Plugins\Knowit.Umbraco.Dictionoid\**" ExcludeFromSingleFile="true" CopyToPublishDirectory="Always" />
+        <None Include="buildTransitive\**" Pack="true" PackagePath="buildTransitive" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="App_Plugins\Knowit.Umbraco.Dictionoid\dictionoid.js">
-            <PackagePath>contentFiles\any\any;content</PackagePath>
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <None Remove="App_Plugins\Knowit.Umbraco.Dictionoid\dictionoid.js" />
+      <None Remove="App_Plugins\Knowit.Umbraco.Dictionoid\views\dictionoid.edit.html" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Update="App_Plugins\Knowit.Umbraco.Dictionoid\dictionoid.js">
             <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-            <PackageCopyToOutput>true</PackageCopyToOutput>
-            <Pack>true</Pack>
-        </None>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        </Content>
         <None Update="App_Plugins\Knowit.Umbraco.Dictionoid\package.manifest">
             <PackagePath>contentFiles\any\any;content</PackagePath>
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -60,13 +62,10 @@
             <PackageCopyToOutput>true</PackageCopyToOutput>
             <Pack>true</Pack>
         </None>
-        <None Update="App_Plugins\Knowit.Umbraco.Dictionoid\views\dictionoid.edit.html">
-            <PackagePath>contentFiles\any\any;content</PackagePath>
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <Content Update="App_Plugins\Knowit.Umbraco.Dictionoid\views\dictionoid.edit.html">
             <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-            <PackageCopyToOutput>true</PackageCopyToOutput>
-            <Pack>true</Pack>
-        </None>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        </Content>
         <None Update="App_Plugins\Knowit.Umbraco.Dictionoid\views\dictionoid.list.html">
             <PackagePath>contentFiles\any\any;content</PackagePath>
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>

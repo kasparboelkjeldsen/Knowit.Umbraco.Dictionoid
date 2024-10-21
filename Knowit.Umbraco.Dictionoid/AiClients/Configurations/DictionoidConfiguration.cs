@@ -2,9 +2,10 @@ namespace Knowit.Umbraco.Dictionoid.AiClients.Configurations;
 
 public class DictionoidConfiguration
 {
-    public bool Enabled { get; set; } = false;
+	public bool Enabled { get; set; } = false;
     public string? ApiKey { get; set; } = string.Empty;
-    public bool CleanupAfterCreate { get; set; } = false;
+	public bool HasApiKey => !string.IsNullOrWhiteSpace(ApiKey);
+	public bool CleanupAfterCreate { get; set; } = false;
     public bool CreateOnNotExist { get; set; } = false;
     public bool CleanupInBackoffice { get; set; } = false;
     public bool TrackHistory { get; set; } = false;

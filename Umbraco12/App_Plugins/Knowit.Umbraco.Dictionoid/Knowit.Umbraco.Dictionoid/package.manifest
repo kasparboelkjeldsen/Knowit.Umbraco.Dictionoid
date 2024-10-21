@@ -1,0 +1,7 @@
+{
+  "id": "Knowit.Umbraco.Dictionoid",
+  "name": "Knowit.Umbraco.Dictionoid",
+  "allowPackageTelemetry": true,
+  "javascript": [ "~/App_Plugins/Knowit.Umbraco.Dictionoid/dictionoid.js" ],
+  "css": [ "~/App_Plugins/Knowit.Umbraco.Dictionoid/dictionoid.css" ]
+}
